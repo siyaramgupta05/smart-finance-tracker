@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  Plus, 
-  Trash2, 
-  DollarSign, 
-  Calendar, 
-  Tag, 
-  Search, 
-  Filter, 
-  TrendingDown, 
+import {
+  Plus,
+  Trash2,
+  DollarSign,
+  Calendar,
+  Tag,
+  Search,
+  Filter,
+  TrendingDown,
   AlertCircle,
   RefreshCw,
   TrendingUp,
@@ -17,7 +17,8 @@ import {
   Layers
 } from 'lucide-react';
 
-const API_URL = 'http://localhost:8081/api/expenses';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8082";
+const API_URL = `${BASE_URL}/api/expenses`;
 
 const CATEGORIES = [
   { name: 'Food', color: '#f87171', bg: 'rgba(248, 113, 113, 0.15)', text: '#f87171' },
@@ -33,7 +34,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  
+
   // Form State
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -75,7 +76,7 @@ export default function App() {
     } else if (title.trim().length > 50) {
       errors.title = 'Title must be under 50 characters';
     }
-    
+
     const parsedAmount = parseFloat(amount);
     if (!amount) {
       errors.amount = 'Amount is required';
@@ -119,7 +120,7 @@ export default function App() {
       };
       const response = await axios.post(API_URL, newExpense);
       setExpenses([response.data, ...expenses]);
-      
+
       // Reset form fields
       setTitle('');
       setAmount('');
@@ -130,8 +131,8 @@ export default function App() {
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       console.error(err);
-      setError(err.response?.status === 400 
-        ? 'Bad request: Please check your input fields.' 
+      setError(err.response?.status === 400
+        ? 'Bad request: Please check your input fields.'
         : 'Failed to save the expense. Please try again.');
     } finally {
       setSubmitting(false);
@@ -161,7 +162,7 @@ export default function App() {
 
   // Analytics
   const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-  
+
   const categoryTotals = expenses.reduce((acc, exp) => {
     acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
     return acc;
@@ -192,23 +193,23 @@ export default function App() {
     const startAngle = currentPercentage * 360;
     currentPercentage += percentage;
     const endAngle = currentPercentage * 360;
-    
+
     // Radians conversion
     const radStart = (startAngle - 90) * Math.PI / 180;
     const radEnd = (endAngle - 90) * Math.PI / 180;
-    
+
     // Radius of outer arc is 38
     const r = 35;
     const cx = 50;
     const cy = 50;
-    
+
     const x1 = cx + r * Math.cos(radStart);
     const y1 = cy + r * Math.sin(radStart);
     const x2 = cx + r * Math.cos(radEnd);
     const y2 = cy + r * Math.sin(radEnd);
-    
+
     const largeArcFlag = percentage > 0.5 ? 1 : 0;
-    
+
     // Return arc path details (single path using stroke-dasharray is easier, but standard arc path is robust)
     let path = '';
     if (percentage >= 0.999) {
@@ -234,8 +235,8 @@ export default function App() {
         <div className="mb-6 p-4 rounded-xl bg-red-950/40 border border-red-500/30 text-red-200 flex items-center gap-3 animate-fade-in">
           <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
           <p className="text-sm font-medium">{error}</p>
-          <button 
-            onClick={fetchExpenses} 
+          <button
+            onClick={fetchExpenses}
             className="ml-auto text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition-colors flex items-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Retry Connection
@@ -263,8 +264,8 @@ export default function App() {
           </div>
           <p className="text-gray-400 text-sm">Monitor your budgets, check categories, and log daily expenses easily.</p>
         </div>
-        
-        <button 
+
+        <button
           onClick={fetchExpenses}
           className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/80 hover:bg-gray-800 border border-gray-700/50 text-gray-200 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
@@ -315,7 +316,7 @@ export default function App() {
             {topCategoryName}
           </h2>
           <p className="text-xs text-gray-500">
-            {maxCatValue > 0 
+            {maxCatValue > 0
               ? `Max share: $${maxCatValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
               : 'No entries yet'}
           </p>
@@ -324,7 +325,7 @@ export default function App() {
 
       {/* Main Grid Section */}
       <main className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+
         {/* Left Column: Form Section */}
         <div className="lg:col-span-5 space-y-8">
           <div className="glass p-6 rounded-2xl relative">
@@ -500,8 +501,8 @@ export default function App() {
                     return (
                       <div key={idx} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
-                          <span 
-                            className="w-3 h-3 rounded-full shrink-0" 
+                          <span
+                            className="w-3 h-3 rounded-full shrink-0"
                             style={{ backgroundColor: slice.color }}
                           />
                           <span className="text-gray-300 font-medium">{slice.name}</span>
@@ -573,8 +574,8 @@ export default function App() {
                 </div>
                 <p className="text-gray-400 text-sm font-semibold">No transactions found</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {searchTerm || selectedFilterCategory 
-                    ? 'Try adjusting your search query or filters.' 
+                  {searchTerm || selectedFilterCategory
+                    ? 'Try adjusting your search query or filters.'
                     : 'Start by filling in the details on the left form!'}
                 </p>
               </div>
@@ -599,29 +600,29 @@ export default function App() {
                       };
 
                       return (
-                        <tr 
-                          key={exp.id} 
+                        <tr
+                          key={exp.id}
                           className="hover:bg-gray-800/30 transition-all text-sm group"
                         >
                           <td className="py-4 pl-4 font-semibold text-white truncate max-w-[150px] sm:max-w-[200px]" title={exp.title}>
                             {exp.title}
                           </td>
                           <td className="py-4">
-                            <span 
+                            <span
                               className="px-2.5 py-1 rounded-full text-xs font-semibold inline-block"
-                              style={{ 
-                                backgroundColor: categoryObj.bg, 
-                                color: categoryObj.text 
+                              style={{
+                                backgroundColor: categoryObj.bg,
+                                color: categoryObj.text
                               }}
                             >
                               {exp.category}
                             </span>
                           </td>
                           <td className="py-4 text-gray-400 text-xs font-medium">
-                            {new Date(exp.date).toLocaleDateString(undefined, { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(exp.date).toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </td>
                           <td className="py-4 text-right pr-4 font-bold text-white font-mono">
