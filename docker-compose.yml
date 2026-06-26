@@ -1,38 +1,20 @@
 services:
-  db:
-    image: mysql:8.0
-    container_name: finance-db
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_DATABASE: personal_finance_db
-      MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
-    image: smart-finance-backend:v1
+    image: smart-finance-backend:latest     # ⚠️ टैग बदलकर 'latest' किया गया है
+    container_name: finance-backend-prod
     ports:
       - "8082:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/personal_finance_db?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/personal_finance_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-    depends_on:
-      db:
-        condition: service_healthy
+      - SPRING_DATASOURCE_PASSWORD=admin   # आपके कंप्यूटर के MySQL का असली पासवर्ड
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   frontend:
-    image: smart-finance-frontend:v1
+    image: smart-finance-frontend:latest    # ⚠️ टैग बदलकर 'latest' किया गया है
+    container_name: finance-frontend-prod
     ports:
       - "3000:80"
     depends_on:
       - backend
-
-volumes:
-  mysql_data:
